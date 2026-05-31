@@ -1,0 +1,18 @@
+# IDE and Antigravity system directories
+.antigravitycli/
+.temp*/
+
+# Logs
+*.log
+
+# Windows system files
+Thumbs.db
+Desktop.ini
+
+.vercel
+
+# Node & Build directories
+node_modules/
+dist/
+.env.local
+.env.*.local
