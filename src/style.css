@@ -1404,10 +1404,101 @@ p {
     margin-top: 10px;
 }
 
+/* 12b. LOCATION SECTION STYLING */
+.location-wrapper {
+    display: grid;
+    grid-template-columns: 420px 1fr;
+    gap: 40px;
+    align-items: stretch;
+    margin-top: 50px;
+}
+
+.location-info-card {
+    background: var(--bg-white);
+    padding: 40px;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-medium);
+    border: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 30px;
+}
+
+.info-item {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+}
+
+.info-icon {
+    width: 48px;
+    height: 48px;
+    background: var(--teal-light);
+    color: var(--teal-dark);
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: var(--transition-smooth);
+}
+
+.info-item:hover .info-icon {
+    background: var(--salmon-accent);
+    color: var(--bg-white);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-glow);
+}
+
+.info-details h3 {
+    font-size: 18px;
+    color: var(--charcoal-dark);
+    margin-bottom: 6px;
+    font-weight: 700;
+}
+
+.info-details p {
+    font-size: 14px;
+    color: var(--charcoal-light);
+    line-height: 1.5;
+}
+
+.map-iframe-container {
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-medium);
+    border: 1px solid var(--border-color);
+    height: 100%;
+    min-height: 450px;
+}
+
+.map-iframe-container iframe {
+    display: block;
+    width: 100%;
+    height: 100%;
+    filter: grayscale(8%) contrast(98%);
+    transition: var(--transition-smooth);
+}
+
+.map-iframe-container:hover iframe {
+    filter: none;
+}
+
 /* 13. RESPONSIVE MEDIA QUERIES */
 @media (max-width: 1024px) {
     .navbar {
         padding: 15px 5%;
+    }
+    
+    .location-wrapper {
+        grid-template-columns: 1fr;
+        gap: 30px;
+    }
+    
+    .map-iframe-container {
+        height: 400px;
+        min-height: auto;
     }
     
     .hero {
