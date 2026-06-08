@@ -174,12 +174,12 @@ p {
 .logo {
     display: flex;
     align-items: center;
-    gap: 3px;
+    gap: 8px;
     cursor: pointer;
 }
 
 .logo-img {
-    height: 48px;
+    height: 44px;
     width: auto;
     object-fit: contain;
     cursor: pointer;
@@ -196,12 +196,27 @@ p {
 }
 
 .brand-name {
-    font-family: var(--font-heading);
-    font-size: 20px;
+    font-family: 'Outfit', sans-serif;
+    font-size: 21px;
     font-weight: 800;
     color: var(--charcoal-dark);
-    letter-spacing: -0.5px;
+    letter-spacing: 0.5px;
     line-height: 1.1;
+    display: flex;
+    align-items: center;
+}
+
+.brand-ayo {
+    color: var(--charcoal-dark);
+    margin-right: 5px;
+}
+
+.brand-de {
+    color: #b27a5b; /* warm wood color from the logo */
+}
+
+.brand-korin {
+    color: var(--charcoal-dark);
 }
 
 .brand-tagline {
@@ -220,6 +235,15 @@ p {
 
 .footer-logo .brand-name {
     color: var(--bg-white);
+}
+
+.footer-logo .brand-ayo,
+.footer-logo .brand-korin {
+    color: var(--bg-white);
+}
+
+.footer-logo .brand-de {
+    color: var(--salmon-accent);
 }
 
 .footer-logo .brand-tagline {
@@ -1094,6 +1118,15 @@ p {
 
 .footer-logo .brand-name {
     color: var(--bg-white);
+}
+
+.footer-logo .brand-ayo,
+.footer-logo .brand-korin {
+    color: var(--bg-white);
+}
+
+.footer-logo .brand-de {
+    color: var(--salmon-accent);
 }
 
 .footer-logo .brand-tagline {
