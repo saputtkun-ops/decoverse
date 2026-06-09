@@ -226,3 +226,56 @@ if (leadForm && step2 && step3) {
     step3.classList.add('active');
   });
 }
+
+// ==========================================
+// 5. IMAGE LIGHTBOX (FULL SIZE MODAL)
+// ==========================================
+const lightbox = document.getElementById('imageLightbox') as HTMLDivElement | null;
+const lightboxImg = document.getElementById('lightboxImg') as HTMLImageElement | null;
+const lightboxCaption = document.getElementById('lightboxCaption') as HTMLDivElement | null;
+const lightboxClose = lightbox?.querySelector('.lightbox-close') as HTMLSpanElement | null;
+
+// Target all images in sliders
+const sliderImages = document.querySelectorAll('.slider-images-wrap img') as NodeListOf<HTMLImageElement>;
+
+sliderImages.forEach(img => {
+  img.addEventListener('click', () => {
+    if (lightbox && lightboxImg) {
+      lightboxImg.src = img.src;
+      if (lightboxCaption) {
+        lightboxCaption.textContent = img.alt || 'Pemasangan Furnitur Custom';
+      }
+      lightbox.classList.add('active');
+      lightbox.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden'; // Disable background scroll
+    }
+  });
+});
+
+function closeLightbox(): void {
+  if (lightbox) {
+    lightbox.classList.remove('active');
+    lightbox.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = ''; // Restore scroll
+  }
+}
+
+if (lightboxClose) {
+  lightboxClose.addEventListener('click', closeLightbox);
+}
+
+if (lightbox) {
+  lightbox.addEventListener('click', (e: MouseEvent) => {
+    // Close only if clicking the background overlay, not the image itself
+    if (e.target === lightbox || e.target === lightboxClose) {
+      closeLightbox();
+    }
+  });
+}
+
+// Add escape key listener to close lightbox
+document.addEventListener('keydown', (e: KeyboardEvent) => {
+  if (e.key === 'Escape') {
+    closeLightbox();
+  }
+});
