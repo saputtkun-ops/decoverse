@@ -254,75 +254,11 @@ function closeAllLocalLightboxes(): void {
   });
 }
 
-// 1. DESKTOP / LAPTOP CUSTOMIZATION (HOVER ON IMAGE TO ZOOM IN CARD, LEAVE CARD TO CLOSE)
-const hasHover = window.matchMedia('(hover: hover)').matches;
-
-if (hasHover) {
-  sliderImages.forEach(img => {
-    img.addEventListener('mouseenter', () => {
-      openLocalLightbox(img);
-    });
-  });
-
-  const serviceCardsList = document.querySelectorAll('.service-card-new') as NodeListOf<HTMLDivElement>;
-  serviceCardsList.forEach(card => {
-    card.addEventListener('mouseleave', () => {
-      const localLightbox = card.querySelector('.local-lightbox') as HTMLDivElement | null;
-      if (localLightbox) {
-        localLightbox.classList.remove('active');
-        localLightbox.setAttribute('aria-hidden', 'true');
-      }
-    });
-  });
-}
-
-// 2. MOBILE / HP CUSTOMIZATION (LONG PRESS 600ms TO ZOOM IN CARD)
-let touchTimeout: number | null = null;
-let touchStartPos = { x: 0, y: 0 };
-
+// CLICK ON IMAGE TO ZOOM IN CARD
 sliderImages.forEach(img => {
-  img.addEventListener('touchstart', (e: TouchEvent) => {
-    const touch = e.touches[0];
-    touchStartPos = { x: touch.clientX, y: touch.clientY };
-    
-    if (touchTimeout) window.clearTimeout(touchTimeout);
-    
-    touchTimeout = window.setTimeout(() => {
-      openLocalLightbox(img);
-    }, 600);
-  }, { passive: true });
-
-  img.addEventListener('touchmove', (e: TouchEvent) => {
-    const touch = e.touches[0];
-    const dx = touch.clientX - touchStartPos.x;
-    const dy = touch.clientY - touchStartPos.y;
-    // Cancel long press if finger moves (scrolling)
-    if (Math.abs(dx) > 10 || Math.abs(dy) > 10) {
-      if (touchTimeout) {
-        window.clearTimeout(touchTimeout);
-        touchTimeout = null;
-      }
-    }
-  }, { passive: true });
-
-  img.addEventListener('touchend', () => {
-    if (touchTimeout) {
-      window.clearTimeout(touchTimeout);
-      touchTimeout = null;
-    }
-  });
-
-  img.addEventListener('touchcancel', () => {
-    if (touchTimeout) {
-      window.clearTimeout(touchTimeout);
-      touchTimeout = null;
-    }
-  });
-  
-  img.addEventListener('click', (e) => {
-    if (hasHover) {
-      e.preventDefault();
-    }
+  img.addEventListener('click', (e: MouseEvent) => {
+    e.stopPropagation();
+    openLocalLightbox(img);
   });
 });
 
