@@ -1614,132 +1614,90 @@ p {
     }
 }
 
-/* 13. LIGHTBOX FOR FULL SIZE IMAGES */
-.lightbox-overlay {
-    position: fixed;
+/* 13. LOCAL LIGHTBOX FOR SERVICE CARDS */
+.service-card-new {
+    position: relative; /* Ensure card is the absolute positioning boundary */
+}
+
+.local-lightbox {
+    position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(15, 19, 30, 0.55);
-    backdrop-filter: blur(2px);
-    -webkit-backdrop-filter: blur(2px);
-    z-index: 2000;
+    background: rgba(15, 19, 30, 0.95);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 100;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    padding: 20px;
+    box-sizing: border-box;
 }
 
-.lightbox-overlay.active {
+.local-lightbox.active {
     opacity: 1;
     pointer-events: auto;
 }
 
-.lightbox-wrapper {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    height: 100%;
-    padding: 40px;
-    box-sizing: border-box;
-}
-
-.lightbox-content {
-    max-width: 90%;
-    max-height: 80vh;
-    border-radius: var(--radius-lg, 16px);
-    box-shadow: 0 30px 70px rgba(0, 0, 0, 0.4);
-    border: 1px solid rgba(255, 255, 255, 0.15);
+.local-lightbox-img {
+    max-width: 100%;
+    max-height: 85%;
     object-fit: contain;
-    transform: scale(0.92);
+    border-radius: var(--radius-md, 8px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transform: scale(0.9);
     transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-.lightbox-overlay.active .lightbox-content {
+.local-lightbox.active .local-lightbox-img {
     transform: scale(1);
 }
 
-.lightbox-close {
+.local-close {
     position: absolute;
-    top: 30px;
-    right: 30px;
+    top: 15px;
+    right: 15px;
     color: #fff;
-    font-size: 32px;
-    font-weight: 300;
+    font-size: 20px;
     cursor: pointer;
-    z-index: 2100;
-    width: 48px;
-    height: 48px;
-    background: rgba(15, 19, 30, 0.65);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
+    z-index: 110;
+    width: 32px;
+    height: 32px;
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    transition: transform 0.3s ease, background 0.3s ease, color 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    transition: transform 0.2s ease, background 0.2s ease, color 0.2s ease;
     user-select: none;
 }
 
-.lightbox-close:hover {
+.local-close:hover {
     color: var(--primary-color, #EAA082);
-    background: rgba(15, 19, 30, 0.85);
-    transform: scale(1.08) rotate(90deg);
-}
-
-.lightbox-caption {
-    margin-top: 20px;
-    color: #fff;
-    font-size: 1.05rem;
-    font-weight: 500;
-    text-align: center;
-    letter-spacing: 0.8px;
-    font-family: var(--font-secondary, inherit);
-    background: rgba(15, 19, 30, 0.75);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    padding: 10px 24px;
-    border-radius: 30px;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    opacity: 0;
-    transform: translateY(10px);
-    transition: opacity 0.35s ease 0.15s, transform 0.35s ease 0.15s;
-}
-
-.lightbox-overlay.active .lightbox-caption {
-    opacity: 1;
-    transform: translateY(0);
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(1.05) rotate(90deg);
 }
 
 @media (max-width: 768px) {
-    .lightbox-wrapper {
-        padding: 20px;
+    .local-lightbox {
+        padding: 15px;
     }
     
-    .lightbox-content {
-        max-width: 95%;
-        max-height: 75vh;
-    }
-    
-    .lightbox-close {
-        top: 20px;
-        right: 20px;
-        width: 40px;
-        height: 40px;
-        font-size: 26px;
-    }
-    
-    .lightbox-caption {
-        font-size: 0.95rem;
-        padding: 8px 18px;
+    .local-close {
+        top: 12px;
+        right: 12px;
+        width: 28px;
+        height: 28px;
+        font-size: 16px;
     }
 }

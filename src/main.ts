@@ -228,86 +228,55 @@ if (leadForm && step2 && step3) {
 }
 
 // ==========================================
-// 5. IMAGE LIGHTBOX (FULL SIZE MODAL)
+// 5. LOCAL IMAGE LIGHTBOX (CARD-CONFINED ZOOM)
 // ==========================================
-const lightbox = document.getElementById('imageLightbox') as HTMLDivElement | null;
-const lightboxImg = document.getElementById('lightboxImg') as HTMLImageElement | null;
-const lightboxCaption = document.getElementById('lightboxCaption') as HTMLDivElement | null;
-const lightboxClose = lightbox?.querySelector('.lightbox-close') as HTMLSpanElement | null;
-
-// Target all images in sliders
 const sliderImages = document.querySelectorAll('.slider-images-wrap img') as NodeListOf<HTMLImageElement>;
 
-function openLightboxForImage(img: HTMLImageElement): void {
-  if (lightbox && lightboxImg) {
-    lightboxImg.src = img.src;
-    if (lightboxCaption) {
-      lightboxCaption.textContent = img.alt || 'Pemasangan Furnitur Custom';
-    }
-    lightbox.classList.add('active');
-    lightbox.setAttribute('aria-hidden', 'false');
-    
-    // Disable scroll on touch devices to avoid touch drag issues
-    if (!window.matchMedia('(hover: hover)').matches) {
-      document.body.style.overflow = 'hidden';
-    }
+function openLocalLightbox(img: HTMLImageElement): void {
+  const card = img.closest('.service-card-new') as HTMLDivElement | null;
+  if (!card) return;
+  
+  const localLightbox = card.querySelector('.local-lightbox') as HTMLDivElement | null;
+  const localLightboxImg = card.querySelector('.local-lightbox-img') as HTMLImageElement | null;
+  
+  if (localLightbox && localLightboxImg) {
+    localLightboxImg.src = img.src;
+    localLightbox.classList.add('active');
+    localLightbox.setAttribute('aria-hidden', 'false');
   }
 }
 
-function closeLightbox(): void {
-  if (lightbox) {
-    lightbox.classList.remove('active');
-    lightbox.setAttribute('aria-hidden', 'true');
-    document.body.style.overflow = ''; // Restore scroll
-  }
+function closeAllLocalLightboxes(): void {
+  const activeLightboxes = document.querySelectorAll('.local-lightbox.active');
+  activeLightboxes.forEach(lbox => {
+    lbox.classList.remove('active');
+    lbox.setAttribute('aria-hidden', 'true');
+  });
 }
 
-function isPointInRect(x: number, y: number, rect: DOMRect, padding: number = 30): boolean {
-  return (
-    x >= rect.left - padding &&
-    x <= rect.right + padding &&
-    y >= rect.top - padding &&
-    y <= rect.bottom + padding
-  );
-}
-
-// 1. DESKTOP / LAPTOP CUSTOMIZATION (HOVER OPEN / MOVE AWAY TO CLOSE)
+// 1. DESKTOP / LAPTOP CUSTOMIZATION (HOVER ON IMAGE TO ZOOM IN CARD, LEAVE CARD TO CLOSE)
 const hasHover = window.matchMedia('(hover: hover)').matches;
 
 if (hasHover) {
   sliderImages.forEach(img => {
     img.addEventListener('mouseenter', () => {
-      openLightboxForImage(img);
-      
-      const slider = img.closest('.service-slider') as HTMLDivElement | null;
-      if (!slider) return;
-      
-      const onMouseMove = (e: MouseEvent) => {
-        if (!lightbox || !lightbox.classList.contains('active')) {
-          document.removeEventListener('mousemove', onMouseMove);
-          return;
-        }
-        
-        const sliderRect = slider.getBoundingClientRect();
-        let isInside = isPointInRect(e.clientX, e.clientY, sliderRect, 35);
-        
-        if (!isInside && lightboxImg) {
-          const lightboxRect = lightboxImg.getBoundingClientRect();
-          isInside = isPointInRect(e.clientX, e.clientY, lightboxRect, 35);
-        }
-        
-        if (!isInside) {
-          closeLightbox();
-          document.removeEventListener('mousemove', onMouseMove);
-        }
-      };
-      
-      document.addEventListener('mousemove', onMouseMove);
+      openLocalLightbox(img);
+    });
+  });
+
+  const serviceCardsList = document.querySelectorAll('.service-card-new') as NodeListOf<HTMLDivElement>;
+  serviceCardsList.forEach(card => {
+    card.addEventListener('mouseleave', () => {
+      const localLightbox = card.querySelector('.local-lightbox') as HTMLDivElement | null;
+      if (localLightbox) {
+        localLightbox.classList.remove('active');
+        localLightbox.setAttribute('aria-hidden', 'true');
+      }
     });
   });
 }
 
-// 2. MOBILE / HP CUSTOMIZATION (LONG PRESS 600ms TO OPEN)
+// 2. MOBILE / HP CUSTOMIZATION (LONG PRESS 600ms TO ZOOM IN CARD)
 let touchTimeout: number | null = null;
 let touchStartPos = { x: 0, y: 0 };
 
@@ -319,7 +288,7 @@ sliderImages.forEach(img => {
     if (touchTimeout) window.clearTimeout(touchTimeout);
     
     touchTimeout = window.setTimeout(() => {
-      openLightboxForImage(img);
+      openLocalLightbox(img);
     }, 600);
   }, { passive: true });
 
@@ -327,7 +296,7 @@ sliderImages.forEach(img => {
     const touch = e.touches[0];
     const dx = touch.clientX - touchStartPos.x;
     const dy = touch.clientY - touchStartPos.y;
-    // Cancel long press if finger moves significantly (scrolling/swiping)
+    // Cancel long press if finger moves (scrolling)
     if (Math.abs(dx) > 10 || Math.abs(dy) > 10) {
       if (touchTimeout) {
         window.clearTimeout(touchTimeout);
@@ -350,7 +319,6 @@ sliderImages.forEach(img => {
     }
   });
   
-  // Prevent click from interfering on hover-capable desktops
   img.addEventListener('click', (e) => {
     if (hasHover) {
       e.preventDefault();
@@ -358,21 +326,33 @@ sliderImages.forEach(img => {
   });
 });
 
-if (lightboxClose) {
-  lightboxClose.addEventListener('click', closeLightbox);
-}
-
-if (lightbox) {
-  lightbox.addEventListener('click', (e: MouseEvent) => {
-    if (e.target === lightbox || e.target === lightboxClose) {
-      closeLightbox();
+// Close buttons for local lightboxes
+const localCloseButtons = document.querySelectorAll('.local-close') as NodeListOf<HTMLSpanElement>;
+localCloseButtons.forEach(btn => {
+  btn.addEventListener('click', (e: MouseEvent) => {
+    e.stopPropagation();
+    const localLightbox = btn.closest('.local-lightbox') as HTMLDivElement | null;
+    if (localLightbox) {
+      localLightbox.classList.remove('active');
+      localLightbox.setAttribute('aria-hidden', 'true');
     }
   });
-}
+});
 
-// Add escape key listener to close lightbox
+// Tap/click on overlay background to close
+const localLightboxes = document.querySelectorAll('.local-lightbox') as NodeListOf<HTMLDivElement>;
+localLightboxes.forEach(lbox => {
+  lbox.addEventListener('click', (e: MouseEvent) => {
+    if (e.target === lbox) {
+      lbox.classList.remove('active');
+      lbox.setAttribute('aria-hidden', 'true');
+    }
+  });
+});
+
+// ESC key to close all zoomed previews
 document.addEventListener('keydown', (e: KeyboardEvent) => {
   if (e.key === 'Escape') {
-    closeLightbox();
+    closeAllLocalLightboxes();
   }
 });
