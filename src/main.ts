@@ -238,19 +238,21 @@ const lightboxClose = lightbox?.querySelector('.lightbox-close') as HTMLSpanElem
 // Target all images in sliders
 const sliderImages = document.querySelectorAll('.slider-images-wrap img') as NodeListOf<HTMLImageElement>;
 
-sliderImages.forEach(img => {
-  img.addEventListener('click', () => {
-    if (lightbox && lightboxImg) {
-      lightboxImg.src = img.src;
-      if (lightboxCaption) {
-        lightboxCaption.textContent = img.alt || 'Pemasangan Furnitur Custom';
-      }
-      lightbox.classList.add('active');
-      lightbox.setAttribute('aria-hidden', 'false');
-      document.body.style.overflow = 'hidden'; // Disable background scroll
+function openLightboxForImage(img: HTMLImageElement): void {
+  if (lightbox && lightboxImg) {
+    lightboxImg.src = img.src;
+    if (lightboxCaption) {
+      lightboxCaption.textContent = img.alt || 'Pemasangan Furnitur Custom';
     }
-  });
-});
+    lightbox.classList.add('active');
+    lightbox.setAttribute('aria-hidden', 'false');
+    
+    // Disable scroll on touch devices to avoid touch drag issues
+    if (!window.matchMedia('(hover: hover)').matches) {
+      document.body.style.overflow = 'hidden';
+    }
+  }
+}
 
 function closeLightbox(): void {
   if (lightbox) {
@@ -260,13 +262,108 @@ function closeLightbox(): void {
   }
 }
 
+function isPointInRect(x: number, y: number, rect: DOMRect, padding: number = 30): boolean {
+  return (
+    x >= rect.left - padding &&
+    x <= rect.right + padding &&
+    y >= rect.top - padding &&
+    y <= rect.bottom + padding
+  );
+}
+
+// 1. DESKTOP / LAPTOP CUSTOMIZATION (HOVER OPEN / MOVE AWAY TO CLOSE)
+const hasHover = window.matchMedia('(hover: hover)').matches;
+
+if (hasHover) {
+  sliderImages.forEach(img => {
+    img.addEventListener('mouseenter', () => {
+      openLightboxForImage(img);
+      
+      const slider = img.closest('.service-slider') as HTMLDivElement | null;
+      if (!slider) return;
+      
+      const onMouseMove = (e: MouseEvent) => {
+        if (!lightbox || !lightbox.classList.contains('active')) {
+          document.removeEventListener('mousemove', onMouseMove);
+          return;
+        }
+        
+        const sliderRect = slider.getBoundingClientRect();
+        let isInside = isPointInRect(e.clientX, e.clientY, sliderRect, 35);
+        
+        if (!isInside && lightboxImg) {
+          const lightboxRect = lightboxImg.getBoundingClientRect();
+          isInside = isPointInRect(e.clientX, e.clientY, lightboxRect, 35);
+        }
+        
+        if (!isInside) {
+          closeLightbox();
+          document.removeEventListener('mousemove', onMouseMove);
+        }
+      };
+      
+      document.addEventListener('mousemove', onMouseMove);
+    });
+  });
+}
+
+// 2. MOBILE / HP CUSTOMIZATION (LONG PRESS 600ms TO OPEN)
+let touchTimeout: number | null = null;
+let touchStartPos = { x: 0, y: 0 };
+
+sliderImages.forEach(img => {
+  img.addEventListener('touchstart', (e: TouchEvent) => {
+    const touch = e.touches[0];
+    touchStartPos = { x: touch.clientX, y: touch.clientY };
+    
+    if (touchTimeout) window.clearTimeout(touchTimeout);
+    
+    touchTimeout = window.setTimeout(() => {
+      openLightboxForImage(img);
+    }, 600);
+  }, { passive: true });
+
+  img.addEventListener('touchmove', (e: TouchEvent) => {
+    const touch = e.touches[0];
+    const dx = touch.clientX - touchStartPos.x;
+    const dy = touch.clientY - touchStartPos.y;
+    // Cancel long press if finger moves significantly (scrolling/swiping)
+    if (Math.abs(dx) > 10 || Math.abs(dy) > 10) {
+      if (touchTimeout) {
+        window.clearTimeout(touchTimeout);
+        touchTimeout = null;
+      }
+    }
+  }, { passive: true });
+
+  img.addEventListener('touchend', () => {
+    if (touchTimeout) {
+      window.clearTimeout(touchTimeout);
+      touchTimeout = null;
+    }
+  });
+
+  img.addEventListener('touchcancel', () => {
+    if (touchTimeout) {
+      window.clearTimeout(touchTimeout);
+      touchTimeout = null;
+    }
+  });
+  
+  // Prevent click from interfering on hover-capable desktops
+  img.addEventListener('click', (e) => {
+    if (hasHover) {
+      e.preventDefault();
+    }
+  });
+});
+
 if (lightboxClose) {
   lightboxClose.addEventListener('click', closeLightbox);
 }
 
 if (lightbox) {
   lightbox.addEventListener('click', (e: MouseEvent) => {
-    // Close only if clicking the background overlay, not the image itself
     if (e.target === lightbox || e.target === lightboxClose) {
       closeLightbox();
     }
